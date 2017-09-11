@@ -12,6 +12,7 @@ Main modules:
 5. memory debugger client: this module is a client to send debug commands 
 
 Misc modules:
+
 6. format converter: convert data between 3 different format: log, data records and json
 7. stacktrace hash: To not save the whole call stacktrace, a stacktrace hash will be created to do the mapping. 
 8. debug command parser
