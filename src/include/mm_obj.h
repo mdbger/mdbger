@@ -24,4 +24,9 @@ typedef struct mm_obj_s {
 	(obj)->rev = 0; \
 } while(0)
 
+#define mm_obj_entry(pos) mm_list_entry(pos, mm_obj, list)
+#define mm_obj_ptr(obj) ((mm_obj*)(obj))
+#define mm_obj_cast(obj) \
+	((obj)->type && (obj)->type < MM_OBJ_TYPE_MAX ? mm_obj_ptr(obj) : NULL)
+
 #endif

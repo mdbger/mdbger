@@ -1,7 +1,7 @@
 #ifndef MM_HASH_H
 #define MM_HASH_H
 
-#include "mm_obj.h"
+#include "mm_obj_ops.h"
 #include "mm_sys.h"
 
 typedef struct mm_bucket_s {
@@ -16,6 +16,22 @@ typedef struct mm_bucket_s {
 	mm_list_add(&(bucket)->head, &(obj)->list)
 
 #define mm_bucket_erase(bucket, obj) mm_list_del(&(obj)->list)
+
+static inline mm_obj* mm_bucket_find(mm_bucket* bucket, u8 type,
+	const void* data)
+{
+	mm_list* pos;
+	mm_obj* obj;
+	const mm_obj_ops* ops = mm_obj_get_ops(type);
+
+	mm_list_for_each(pos, &bucket->head) {
+		obj = mm_obj_entry(pos);
+		if(ops->cmp(obj, type, data) == 0)
+			return obj;
+	}
+
+	return NULL;
+}
 
 typedef struct mm_hash_s {
 	mm_bucket* bucket;
@@ -52,6 +68,32 @@ static inline void mm_hash_fini_bucket(mm_hash* hash)
 	hash->ops->free(hash->bucket);
 	hash->bucket = NULL;
 	hash->size = 0;
+}
+
+static inline mm_obj* mm_hash_find(mm_hash* hash, u8 type, const void* data)
+{
+	const mm_obj_ops* ops = mm_obj_get_ops(type);
+	u32 hcode = ops->data_hcode(type, data);
+	return mm_bucket_find(mm_hash_bucket(hash, hcode), type, data);
+}
+
+static inline mm_bucket* mm_hash_obj_bucket(mm_hash* hash, mm_obj* obj)
+{
+	const mm_obj_ops* ops = mm_obj_get_ops(mm_obj_type(obj));
+	u32 hcode = ops->hcode(obj);
+	return mm_hash_bucket(hash, hcode);
+}
+
+static inline void mm_hash_insert(mm_hash* hash, mm_obj* obj)
+{
+	mm_bucket* bucket = mm_hash_obj_bucket(hash, obj);
+	mm_bucket_insert(bucket, obj);
+}
+
+static inline void mm_hash_erase(mm_hash* hash, mm_obj* obj)
+{
+	mm_bucket* bucket = mm_hash_obj_bucket(hash, obj);
+	mm_bucket_erase(bucket, obj);
 }
 
 #endif

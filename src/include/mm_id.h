@@ -15,21 +15,25 @@ typedef struct mm_id_node_s {
 	(node)->refcnt = 0; \
 } while(0)
 
-static inline mm_id_insert(mm_hash* hash, mm_id_node* node)
-{
-	mm_bucket* bucket = mm_hash_bucket(hash, node->id);
-	mm_bucket_insert(bucket, node);
-}
+#define mm_id_hcode(id) (id)
 
-static inline mm_id_erase(mm_hash* hash, mm_id_node* node)
+#define mm_id_node_inert(hash, node) mm_hash_inesrt(hash, mm_obj_cast(node))
+#define mm_id_node_erase(hash, node) mm_hash_erase(hash, mm_obj_cast(node))
+
+static inline mm_id_node* mm_id_node_find(mm_hash* hash, mm_id_t id)
 {
-	mm_bucket* bucket = mm_hash_bucket(hash, node->id);
-	mm_bucket_erase(bucket, node);
+	return (mm_id_node*)mm_hash_find(hash, MM_ID_NODE, &id);
 }
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+u32 mm_id_node_hcode(mm_id_node* node);
+u32 mm_id_data_hcode(u8 type, mm_id_t* id);
+int mm_id_node_cmp(mm_id_node* node, u8 type, mm_id_t* id);
+
+const mm_obj_ops* mm_id_node_ops();
 
 #ifdef __cplusplus
 }
