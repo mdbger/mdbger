@@ -6,7 +6,7 @@
 typedef struct mm_list_s {
 	struct mm_list_s* next;
 	struct mm_list_s* prev;
-} mm_list_t;
+} mm_list;
 
 #define mm_list_init(list) do { \
 	(list)->prev = (list); \
@@ -17,8 +17,8 @@ typedef struct mm_list_s {
 #define mm_list_entry(p, T, M) container_of(p, T, M)
 #define mm_list_unlinked(list) mm_list_empty(list)
 
-static inline void mm_list_insert(mm_list_t* list, mm_list_t* prev,
-	mm_list_t* next)
+static inline void mm_list_insert(mm_list* list, mm_list* prev,
+	mm_list* next)
 {
 	list->prev = prev;
 	list->next = next;
@@ -27,15 +27,15 @@ static inline void mm_list_insert(mm_list_t* list, mm_list_t* prev,
 	prev->next = list;
 }
 
-static inline void mm_list_erase(mm_list_t* prev, mm_list_t* next)
+static inline void mm_list_erase(mm_list* prev, mm_list* next)
 {
 	prev->next = next;
 	next->prev = prev;
 }
 
-static inline void mm_list_join(mm_list_t* list, mm_list_t* l)
+static inline void mm_list_join(mm_list* list, mm_list* l)
 {
-	mm_list_t *next = l->next, *prev = l->prev;
+	mm_list *next = l->next, *prev = l->prev;
 
 	if(mm_list_empty(l))
 		return;
